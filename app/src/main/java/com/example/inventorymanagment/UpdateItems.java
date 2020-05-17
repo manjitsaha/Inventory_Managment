@@ -20,8 +20,8 @@ public class UpdateItems extends AppCompatActivity {
     public void clear(){
         sac_hsn.setText("");
         itemName.setText("");
-        price.setText(" ");
-        stock.setText(" ");
+        price.setText("");
+        stock.setText("");
     }
 
     public void show(){
@@ -37,9 +37,9 @@ public class UpdateItems extends AppCompatActivity {
             do {
                 midArr.add(c.getInt(0));
                 mitemNameArr.add(c.getString(1));
-                msacPriceStockArr.add(c.getString(2) + "   "
-                        + c.getInt(3) + "   "
-                        + c.getInt(4));
+                msacPriceStockArr.add("Sac/Hsn : "+c.getString(2) + "  "
+                        + "Price : "+c.getInt(3) + "   "
+                        + "Stock : "+c.getInt(4));
                 //(id ,item_name , sac_hsn , price , stock)
             } while (c.moveToNext());
         }

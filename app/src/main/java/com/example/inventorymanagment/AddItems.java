@@ -20,30 +20,28 @@ public class AddItems extends AppCompatActivity {
     public void clear(){
         sac_hsn.setText("");
         itemName.setText("");
-        price.setText(" ");
-        stock.setText(" ");
+        price.setText("");
+        stock.setText("");
     }
 
     public void show(){
-
-        ArrayList midArr = new ArrayList();
-        ArrayList mitemNameArr = new ArrayList();
-        ArrayList msacPriceStockArr = new ArrayList();
-        myAdapter mad = new myAdapter(this , midArr ,mitemNameArr ,msacPriceStockArr);
+        CustomListView.midArr.clear();
+        CustomListView.mitemNameArr.clear();
+        CustomListView.msacPriceStockArr.clear();
 
         Cursor c = CustomListView.sql.rawQuery("SELECT * FROM item_list", null);
 
         if (c.moveToFirst()) {
             do {
-                midArr.add(c.getInt(0));
-                mitemNameArr.add(c.getString(1));
-                msacPriceStockArr.add(c.getString(2) + "   "
-                        + c.getInt(3) + "   "
-                        + c.getInt(4));
+                CustomListView.midArr.add(c.getInt(0));
+                CustomListView.mitemNameArr.add(c.getString(1));
+                CustomListView.msacPriceStockArr.add("Sac/Hsn : "+c.getString(2) + "  "
+                        + "Price : "+c.getInt(3) + "   "
+                        + "Stock : "+c.getInt(4));
                 //(id ,item_name , sac_hsn , price , stock)
             } while (c.moveToNext());
         }
-        CustomListView.lv.setAdapter(mad);
+        CustomListView.lv.setAdapter(CustomListView.mad);
         c.close();
 
     }

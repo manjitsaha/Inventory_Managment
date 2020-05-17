@@ -31,15 +31,16 @@ public class CustomListView extends AppCompatActivity {
     static SQLiteDatabase sql;
 
     static ListView lv;
-    ArrayList midArr = new ArrayList();
-    ArrayList mitemNameArr = new ArrayList();
-    ArrayList msacPriceStockArr = new ArrayList();
+    static ArrayList midArr = new ArrayList();
+    static ArrayList mitemNameArr = new ArrayList();
+    static ArrayList msacPriceStockArr = new ArrayList();
+    static myAdapter mad;
 
     public void show() {
         midArr.clear();
         mitemNameArr.clear();
         msacPriceStockArr.clear();
-        myAdapter mad = new myAdapter(this , midArr ,mitemNameArr ,msacPriceStockArr);
+        mad = new myAdapter(this , midArr ,mitemNameArr ,msacPriceStockArr);
 
         Cursor c = sql.rawQuery("SELECT * FROM item_list", null);
 
