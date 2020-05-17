@@ -1,11 +1,15 @@
 package com.example.inventorymanagment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -59,6 +64,33 @@ public class CustomListView extends AppCompatActivity {
         show();
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater mi = getMenuInflater();
+        mi.inflate(R.menu.menu_items , menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch(item.getItemId()){
+            case R.id.about:
+                new AlertDialog.Builder(this).setTitle("Credit")
+                        .setMessage("THIS APP IS DEVELOPED BY MANJIT SAHA")
+                        .setPositiveButton("Close" , null).show();
+
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
