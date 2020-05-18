@@ -1,11 +1,11 @@
 package com.example.inventorymanagment;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,26 +15,76 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuItemCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
 public class CustomListView extends AppCompatActivity {
-    FloatingActionButton fab;
+
     static SQLiteDatabase sql;
+    FloatingActionButton fab;
 
     static ListView lv;
+    SearchView sv;
     static ArrayList midArr = new ArrayList();
     static ArrayList mitemNameArr = new ArrayList();
     static ArrayList msacPriceStockArr = new ArrayList();
     static myAdapter mad;
+
+
+    public void search(String searchText) {
+        ArrayList localIdArr = new ArrayList();
+        ArrayList localItemNameArrr = new ArrayList();
+        ArrayList localSacPriceStockArrr = new ArrayList();
+
+        myAdapter localMad = new myAdapter(getApplicationContext(), localIdArr, localItemNameArrr, localSacPriceStockArrr);
+        Log.i("Query ", searchText);
+        Cursor c = sql.rawQuery("SELECT * FROM item_list WHERE item_name LIKE '%" + searchText + "%'", null);
+
+        if (c.moveToFirst()) {
+            do {
+                localIdArr.add(c.getInt(0));
+                localItemNameArrr.add(c.getString(1));
+                localSacPriceStockArrr.add("Sac/Hsn : " + c.getString(2) + "  "
+                        + "Price : " + c.getInt(3) + "   "
+                        + "Stock : " + c.getInt(4));
+                //(id ,item_name , sac_hsn , price , stock)
+            } while (c.moveToNext());
+        }
+
+
+        lv.setAdapter(localMad);
+        c.close();
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(getApplicationContext(), UpdateItems.class);
+                i.putExtra("Id", Integer.parseInt(localIdArr.get(position).toString()));
+                startActivity(i);
+
+            }
+        });
+
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                delete(Integer.parseInt(localIdArr.get(position).toString()));
+                lv.setSelection(position);
+                return false;
+            }
+        });
+    }
+
 
     public void show() {
         midArr.clear();
@@ -57,6 +107,7 @@ public class CustomListView extends AppCompatActivity {
         lv.setAdapter(mad);
         c.close();
 
+
     }
 
     public void delete(int position){
@@ -71,6 +122,26 @@ public class CustomListView extends AppCompatActivity {
 
         MenuInflater mi = getMenuInflater();
         mi.inflate(R.menu.menu_items , menu);
+
+        MenuItem svi = menu.findItem(R.id.searchView);
+        SearchView sv = (SearchView) MenuItemCompat.getActionView(svi);
+
+        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                search(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                search(newText);
+                return false;
+            }
+        });
+
+
+
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -98,8 +169,11 @@ public class CustomListView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_list_view);
 
-        fab = findViewById(R.id.floatingActionButton);
+
         lv = findViewById(R.id.customListView);
+        fab = findViewById(R.id.floatingActionButton);
+
+        //    sv = findViewById(R.id.searchView);
 
         sql = this.openOrCreateDatabase("inventory", MODE_PRIVATE, null);
         sql.execSQL("CREATE TABLE IF NOT EXISTS item_list (Id INTEGER PRIMARY KEY," +
@@ -111,13 +185,17 @@ public class CustomListView extends AppCompatActivity {
 
         show();
 
-        fab.setOnClickListener((view) -> {
 
-            Intent i = new Intent(getApplicationContext(), AddItems.class);
-            startActivity(i);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Intent i = new Intent(getApplicationContext(), AddItems.class);
+                startActivity(i);
 
+            }
         });
+
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -125,23 +203,22 @@ public class CustomListView extends AppCompatActivity {
                 Intent i = new Intent(getApplicationContext() , UpdateItems.class);
                 i.putExtra("Id" , Integer.parseInt(midArr.get(position).toString()));
                 startActivity(i);
-
               }
         });
 
         lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
                 delete(Integer.parseInt(midArr.get(position).toString()));
                 lv.setSelection(position);
-
                 return true;
             }
         });
 
 
     }
+
+
 }
 
 
@@ -178,4 +255,6 @@ class myAdapter extends ArrayAdapter{
 
         return row;
     }
+
+
 }

@@ -9,8 +9,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
-
 public class AddItems extends AppCompatActivity {
 
 
@@ -25,6 +23,7 @@ public class AddItems extends AppCompatActivity {
     }
 
     public void show(){
+
         CustomListView.midArr.clear();
         CustomListView.mitemNameArr.clear();
         CustomListView.msacPriceStockArr.clear();
