@@ -9,8 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.util.ArrayList;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class UpdateItems extends AppCompatActivity {
     Button updateBtn;
@@ -25,25 +24,21 @@ public class UpdateItems extends AppCompatActivity {
     }
 
     public void show(){
+        recyclerView.mData.clear();
 
-        ArrayList midArr = new ArrayList();
-        ArrayList mitemNameArr = new ArrayList();
-        ArrayList msacPriceStockArr = new ArrayList();
-        myAdapter mad = new myAdapter(this , midArr ,mitemNameArr ,msacPriceStockArr);
-
-        Cursor c = CustomListView.sql.rawQuery("SELECT * FROM item_list", null);
+        Cursor c = recyclerView.sql.rawQuery("SELECT * FROM item_list", null);
 
         if (c.moveToFirst()) {
             do {
-                midArr.add(c.getInt(0));
-                mitemNameArr.add(c.getString(1));
-                msacPriceStockArr.add("Sac/Hsn : "+c.getString(2) + "  "
-                        + "Price : "+c.getInt(3) + "   "
-                        + "Stock : "+c.getInt(4));
-                //(id ,item_name , sac_hsn , price , stock)
+                recyclerView.mData.add(new ListItems(c.getInt(0),
+                        c.getInt(3),
+                        c.getInt(4),
+                        c.getString(1),
+                        c.getString(2)));
             } while (c.moveToNext());
         }
-        CustomListView.lv.setAdapter(mad);
+        recyclerView.rv.setAdapter(recyclerView.itemAdapter);
+        recyclerView.rv.setLayoutManager(new LinearLayoutManager(this));
         c.close();
 
     }
@@ -51,14 +46,14 @@ public class UpdateItems extends AppCompatActivity {
     public void setData(){
         Intent i = getIntent();
         int id = i.getIntExtra("Id" , -1);
-        Cursor c = CustomListView.sql.rawQuery("SELECT * FROM item_list WHERE Id = "+id+"" , null);
+        Cursor c = recyclerView.sql.rawQuery("SELECT * FROM item_list WHERE Id = " + id + "", null);
 
         if(c.moveToFirst()){
             do{
                 itemName.setText(c.getString(1));
                 sac_hsn.setText(c.getString(2));
-                price.setText(Integer.toString(c.getInt(3)));
-                stock.setText(Integer.toString(c.getInt(4)));
+                price.setText(String.valueOf(c.getInt(3)));
+                stock.setText(String.valueOf(c.getInt(4)));
             }while (c.moveToNext());
         }
         c.close();
@@ -76,7 +71,7 @@ public class UpdateItems extends AppCompatActivity {
         Intent i = getIntent();
         int id = i.getIntExtra("Id" , -1);
         if(id != -1){
-            CustomListView.sql.execSQL("UPDATE item_list SET item_name = '"+itemname+"', sac_hsn = '"+sac+"'," +
+            recyclerView.sql.execSQL("UPDATE item_list SET item_name = '" + itemname + "', sac_hsn = '" + sac + "'," +
                                                                         "price = "+pricee+", stock = "+stockk+" WHERE ID = "+id+"");
             //(id ,item_name , sac_hsn , price , stock)
 

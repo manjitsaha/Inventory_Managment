@@ -8,11 +8,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class AddItems extends AppCompatActivity {
 
 
-     Button btn;
+    Button btn;
     EditText sac_hsn, itemName , price, stock;
 
     public void clear(){
@@ -23,24 +24,20 @@ public class AddItems extends AppCompatActivity {
     }
 
     public void show(){
-
-        CustomListView.midArr.clear();
-        CustomListView.mitemNameArr.clear();
-        CustomListView.msacPriceStockArr.clear();
-
-        Cursor c = CustomListView.sql.rawQuery("SELECT * FROM item_list", null);
+        recyclerView.mData.clear();
+        Cursor c = recyclerView.sql.rawQuery("SELECT * FROM item_list", null);
 
         if (c.moveToFirst()) {
             do {
-                CustomListView.midArr.add(c.getInt(0));
-                CustomListView.mitemNameArr.add(c.getString(1));
-                CustomListView.msacPriceStockArr.add("Sac/Hsn : "+c.getString(2) + "  "
-                        + "Price : "+c.getInt(3) + "   "
-                        + "Stock : "+c.getInt(4));
-                //(id ,item_name , sac_hsn , price , stock)
+                recyclerView.mData.add(new ListItems(c.getInt(0),
+                        c.getInt(3),
+                        c.getInt(4),
+                        c.getString(1),
+                        c.getString(2)));
             } while (c.moveToNext());
         }
-        CustomListView.lv.setAdapter(CustomListView.mad);
+        recyclerView.rv.setAdapter(recyclerView.itemAdapter);
+        recyclerView.rv.setLayoutManager(new LinearLayoutManager(this));
         c.close();
 
     }
@@ -52,7 +49,7 @@ public class AddItems extends AppCompatActivity {
         String stockk = stock.getText().toString();
 
 
-        CustomListView.sql.execSQL("INSERT INTO item_list(item_name , sac_hsn , price , stock) VALUES ('"+itemname+"' , '"+sac+"','"+pricee+"' , '"+stockk+"')");
+        recyclerView.sql.execSQL("INSERT INTO item_list(item_name , sac_hsn , price , stock) VALUES ('" + itemname + "' , '" + sac + "','" + pricee + "' , '" + stockk + "')");
         Toast.makeText(getApplicationContext() , "Added" , Toast.LENGTH_SHORT).show();
 
         show();
